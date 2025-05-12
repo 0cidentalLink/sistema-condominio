@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Ocorrências</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+    <h2>Enviar Ocorrência</h2>
+    <form id="formOcorrencia">
+        <input type="text" id="titulo" placeholder="Título da Ocorrência" required><br>
+        <textarea id="descricao" placeholder="Descrição" required></textarea><br>
+        <button type="submit">Enviar</button>
+    </form>
+
+    <h3>Minhas Ocorrências</h3>
+    <div id="minhasOcorrencias"></div>
+
+    <script>
+        document.getElementById('formOcorrencia').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
+            const titulo = document.getElementById('titulo').value.trim();
+            const descricao = document.getElementById('descricao').value.trim();
+            const data = new Date().toLocaleString();
+
+            const ocorrencias = JSON.parse(localStorage.getItem('ocorrencias')) || [];
+            ocorrencias.push({ titulo, descricao, data, usuario: usuarioLogado, resposta: null });
+            localStorage.setItem('ocorrencias', JSON.stringify(ocorrencias));
+            alert('Ocorrência enviada!');
+            location.href = "index.html";
+        });
+
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        const listaOcorrencias = document.getElementById('minhasOcorrencias');
+
+        const ocorrencias = JSON.parse(localStorage.getItem('ocorrencias')) || [];
+        const minhas = ocorrencias.filter(o => o.usuario === usuarioLogado);
+
+        minhas.forEach(o => {
+            const div = document.createElement("div");
+            div.className = "ocorrencia";
+            div.innerHTML = `<strong>${o.titulo}</strong><p>${o.descricao}</p><small>${o.data}</small>`;
+            if (o.resposta) {
+                div.innerHTML += `<p><strong>Resposta:</strong> ${o.resposta}</p>`;
+            }
+            listaOcorrencias.appendChild(div);
+        });
+    </script>
+</body>
+</html>
